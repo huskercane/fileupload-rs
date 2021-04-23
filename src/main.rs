@@ -198,7 +198,7 @@ async fn main() -> std::io::Result<()> {
             // update db
             let result = update_deleted(not_deleted_file.id);
             debug!("Update size {}", result.unwrap().to_string());
-        } else {
+        } else if y > 0 {
             // add a task to delete
             let duration = std::time::Duration::from_secs(y.num_seconds() as u64);
             let now_future = Delay::new(duration);
