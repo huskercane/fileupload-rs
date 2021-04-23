@@ -19,7 +19,8 @@ log = "*"
 env_logger = "*"
 
 futures = "*"
-
+futures-timer = "*"
+tokio = {version = "1.5.0", features = ["time"]}
 # serialization library
 serde = "*"
 serde_json = "*"
@@ -31,3 +32,7 @@ chrono = { version = "*", features = ["serde"] }
 diesel = { version = "1.4.4", features = ["sqlite", "chrono"] }
 dotenv = "0.15.0"
 
+cached = "*"
+toml = "*"
+strum = "*"
+strum_macros = "*"

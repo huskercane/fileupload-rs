@@ -1,3 +1,5 @@
+pub(crate) mod configuration;
+
 use crate::file_storage;
 
 #[derive(Serialize, Queryable)]
