@@ -186,11 +186,14 @@ async fn main() -> std::io::Result<()> {
 
     let all_not_deleted_files = get_all_file_name();
     for not_deleted_file in all_not_deleted_files {
-        let naive = not_deleted_file.created_at;
+        let created_at = not_deleted_file.created_at;
+        let utc_time = Utc.from_local_datetime(&created_at).unwrap();
+        let duration_since_create = now.signed_duration_since(utc_time);
+
         let file_path = format!("{}/{}-{}", app_configuration.clone().file_storage_location, not_deleted_file.storage_name, not_deleted_file.file_name);
-        let u = Local.from_local_datetime(&naive).unwrap();
-        let y = now.signed_duration_since(u);
-        if y.num_seconds() > app_configuration.retention_time as i64 {
+
+        let duration_in_seconds = duration_since_create.num_seconds();
+        if duration_in_seconds > app_configuration.retention_time as i64 {
             let b = std::path::Path::new(&file_path).exists();
             if b {
                 fs::remove_file(&file_path).unwrap();
@@ -198,9 +201,9 @@ async fn main() -> std::io::Result<()> {
             // update db
             let result = update_deleted(not_deleted_file.id);
             debug!("Update size {}", result.unwrap().to_string());
-        } else if y > 0 {
+        } else if duration_in_seconds > 0 {
             // add a task to delete
-            let duration = std::time::Duration::from_secs(y.num_seconds() as u64);
+            let duration = std::time::Duration::from_secs(duration_in_seconds as u64);
             let now_future = Delay::new(duration);
             let x = now_future.map(move |()| {
                 // let string = format!("Delete file now - {}", file_name);
