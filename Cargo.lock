@@ -638,6 +638,7 @@ dependencies = [
  "chrono",
  "diesel_derives",
  "libsqlite3-sys",
+ "r2d2",
 ]
 
 [[package]]
@@ -734,6 +735,7 @@ dependencies = [
  "futures-timer",
  "log",
  "openssl",
+ "r2d2",
  "rand",
  "sanitize-filename",
  "serde",
@@ -1457,6 +1459,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "r2d2"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "545c5bc2b880973c9c10e4067418407a0ccaa3091781d1671d46eb35107cb26f"
+dependencies = [
+ "log",
+ "parking_lot",
+ "scheduled-thread-pool",
+]
+
+[[package]]
 name = "rand"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1556,6 +1569,15 @@ checksum = "bf18934a12018228c5b55a6dae9df5d0641e3566b3630cb46cc55564068e7c2f"
 dependencies = [
  "lazy_static",
  "regex",
+]
+
+[[package]]
+name = "scheduled-thread-pool"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc6f74fd1204073fa02d5d5d68bec8021be4c38690b61264b2fdb48083d0e7d7"
+dependencies = [
+ "parking_lot",
 ]
 
 [[package]]

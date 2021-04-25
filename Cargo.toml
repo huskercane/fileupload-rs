@@ -29,8 +29,9 @@ serde_derive = "*"
 rand = "*"
 chrono = { version = "*", features = ["serde"] }
 
-diesel = { version = "1.4.4", features = ["sqlite", "chrono"] }
+diesel = { version = "1.4.4", features = ["sqlite", "chrono", "r2d2"] }
 dotenv = "0.15.0"
+r2d2 = "*"
 
 cached = "*"
 toml = "*"

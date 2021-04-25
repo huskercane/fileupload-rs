@@ -1,4 +1,5 @@
 pub(crate) mod configuration;
+pub(crate) mod upload_file;
 
 use crate::file_storage;
 
