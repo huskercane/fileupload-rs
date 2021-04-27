@@ -1,0 +1,14 @@
+[development]
+retention_time = 60
+download_url = "127.0.0.1:8080"
+file_storage_location = "./tmp"
+
+[staging]
+retention_time = 3600
+download_url = "127.0.0.1:8080"
+file_storage_location = "./tmp"
+
+[production]
+retention_time = 3600
+download_url = "127.0.0.1:8080"
+file_storage_location = "./tmp"
