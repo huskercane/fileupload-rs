@@ -37,8 +37,6 @@ mod config;
 mod db;
 mod web_function;
 
-// TODO: look at pool in document
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // env_logger::Builder::from_env("trace").init();
@@ -63,7 +61,7 @@ async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
-    let all_not_deleted_files = get_all_file_name(&pool);
+    let all_not_deleted_files = get_all_file_name(&pool).unwrap();
     for not_deleted_file in all_not_deleted_files {
         let created_at = not_deleted_file.created_at;
         let utc_time = Utc.from_local_datetime(&created_at).unwrap();
@@ -120,12 +118,12 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
 
     let y = app_configuration.clone();
-    let client = web::Data::new(app_configuration);
+    let configuration = web::Data::new(app_configuration);
 
     HttpServer::new(move || {
         App::new()
-            .app_data(pool.clone())
-            .app_data(client.clone())
+            .data(pool.clone())
+            .app_data(configuration.clone())
             .wrap(middleware::Logger::default())
             .service(save_file)
             .service(download_file)

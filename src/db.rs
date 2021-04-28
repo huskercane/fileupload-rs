@@ -17,7 +17,7 @@ use crate::schema;
 
 pub(crate) type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
 
-pub fn create_file_storage(file_name: &str, storage_name: &str, pool: &DbPool) -> Option<FileStorage> {
+pub fn create_file_storage(file_name: &str, storage_name: &str, pool: &DbPool) -> Result<Option<FileStorage>, diesel::result::Error> {
     let connection = pool.get().expect("couldn't get db connection from pool");
 
     let new_post = NewFileStorage { file_name, storage_name };
@@ -31,24 +31,25 @@ pub fn create_file_storage(file_name: &str, storage_name: &str, pool: &DbPool) -
     get_file_name(storage_name, pool)
 }
 
-pub fn get_file_name(download_name: &str, pool: &DbPool) -> Option<FileStorage> {
+pub fn get_file_name(download_name: &str, pool: &DbPool) -> Result<Option<FileStorage>, diesel::result::Error> {
     let connection = pool.get().expect("couldn't get db connection from pool");
     schema::file_storage::dsl::file_storage
         .filter(schema::file_storage::storage_name.eq(download_name))
         .first(&connection)
         .optional()
-        .unwrap()
 }
 
-pub fn get_all_file_name(pool: &DbPool) -> Vec<FileStorage> {
+pub fn get_all_file_name(pool: &DbPool) -> Result<Vec<FileStorage>, diesel::result::Error> {
     let connection = pool.get().expect("couldn't get db connection from pool");
-    return schema::file_storage::dsl::file_storage
+    let result = schema::file_storage::dsl::file_storage
         .filter(schema::file_storage::is_deleted.eq(false))
         .load::<FileStorage>(&connection)
         .expect("Error loading FileStorage");
+
+    return Ok(result);
 }
 
-pub fn update_deleted(id: i32, pool: &DbPool) -> QueryResult<usize> {
+pub fn update_deleted(id: i32, pool: &DbPool) -> Result<usize, diesel::result::Error> {
     let connection = pool.get().expect("couldn't get db connection from pool");
 
     let target = schema::file_storage::dsl::file_storage
