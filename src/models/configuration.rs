@@ -17,6 +17,14 @@ pub struct Configuration {
     pub(crate) file_storage_location: String,
 }
 
+impl std::fmt::Display for Configuration {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "retention_time:{}, download_url:{}. file_storage_location:{}",
+               self.retention_time, self.download_url, self.file_storage_location)
+    }
+}
+
+
 #[derive(Deserialize, PartialEq, EnumString, Clone)]
 pub(crate) enum Environment {
     #[strum(serialize = "development", serialize = "d")]

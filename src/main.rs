@@ -3,9 +3,9 @@ extern crate chrono;
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
-extern crate env_logger;
 #[macro_use]
 extern crate log;
+extern crate env_logger;
 extern crate r2d2;
 extern crate rand;
 extern crate serde;
@@ -39,8 +39,6 @@ mod web_function;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // env_logger::Builder::from_env("trace").init();
-    std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info,main=debug");
     env_logger::init();
 
     let app_configuration = config::load_config();
@@ -119,6 +117,8 @@ async fn main() -> std::io::Result<()> {
 
     let y = app_configuration.clone();
     let configuration = web::Data::new(app_configuration);
+
+    info!("Using config: {}", config::load_config());
 
     HttpServer::new(move || {
         App::new()
