@@ -20,7 +20,7 @@ env_logger = "*"
 
 futures = "*"
 futures-timer = "*"
-tokio = {version = "1.5.0", features = ["time"]}
+tokio = { version = "1.5.0", features = ["time"] }
 # serialization library
 serde = "*"
 serde_json = "*"
@@ -37,3 +37,7 @@ cached = "*"
 toml = "*"
 strum = "*"
 strum_macros = "*"
+
+crypto = { version = "0.2.0", features = ["aead", "elliptic-curve", "cipher"] }
+
+encryptfile = "*"
