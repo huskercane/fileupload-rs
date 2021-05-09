@@ -63,11 +63,11 @@ pub(crate) async fn save_file(
     }
     let random_name_2 = random_name.clone();
     let incoming_file_name_2 = incoming_file_name.clone();
+    let file_save_location = app_configuration.file_storage_location.clone();
     let x1 = request.headers().clone().to_owned();
-    info!("XXX {}", x1.contains_key("PASSWORD"));
+
     let file_password = x1.get("PASSWORD");
 
-    let string = app_configuration.file_storage_location.clone();
     match file_password {
         None => {
             info!("No password so not encrypting")
@@ -75,12 +75,21 @@ pub(crate) async fn save_file(
 
         Some(password) => {
             // let file_encrypt_future = async move {
-            encrypt_file(string, random_name_2, incoming_file_name_2, password).await;
+            encrypt_file(
+                file_save_location,
+                random_name_2,
+                incoming_file_name_2,
+                password,
+            )
+            .await;
         }
     };
 
     let response = FileDetail {
-        download_url: format!("https://{}/{}", app_configuration.download_url, random_name),
+        download_url: format!(
+            "https://{}/files/{}",
+            app_configuration.download_url, random_name
+        ),
         expiry: one_hour_from_now
             .unwrap()
             .format("%Y-%m-%d %H:%M:%S")
@@ -144,10 +153,13 @@ async fn encrypt_file(
     };
 
     x.encrypt();
+
+    // TODO delete unecrypted file
 }
 
 #[get("/files/{file_name}")]
 pub(crate) async fn download_file(
+    request: HttpRequest,
     web::Path(file_name_x): web::Path<String>,
     data: web::Data<Configuration>,
     pool: web::Data<DbPool>,
@@ -164,12 +176,43 @@ pub(crate) async fn download_file(
                 "{}/{}-{}",
                 data.file_storage_location, ff_name.storage_name, ff_name.file_name
             );
-            info!("Delete file after download - {}", filepath);
-            // delete file
-            let b = std::path::Path::new(&filepath).exists();
-            if b {
-                fs::remove_file(&filepath).unwrap();
-            }
+            let filepath_enc = format!(
+                "{}/{}-{}.enc",
+                data.file_storage_location, ff_name.storage_name, ff_name.file_name
+            );
+            // TODO: cannot delete this till download is done
+            // TODO: need to decrypt file
+            // info!("Delete file after download - {}", filepath);
+            // // delete file
+            // let b = std::path::Path::new(&filepath).exists();
+            // if b {
+            //     fs::remove_file(&filepath).unwrap();
+            // }
+            let x1 = request.headers().clone().to_owned();
+            let file_password = x1.get("PASSWORD");
+
+            match file_password {
+                None => {
+                    info!("No password so not encrypting")
+                }
+
+                Some(password) => {
+                    // let uploaded_file_name = format!(
+                    //     "{}/{}-{}",
+                    //     data.file_storage_location,
+                    //     ff_name.storage_name,
+                    //     ff_name.file_name.clone()
+                    // );
+                    let x = UploadedFile {
+                        file_name: filepath.clone(),
+                        saved_file: filepath_enc,
+                        password: Some(String::from(password.to_str().unwrap())),
+                        private_key: None,
+                    };
+
+                    x.decrypt();
+                }
+            };
 
             web::block(move || update_deleted(ff_name.id, &pool))
                 .await
